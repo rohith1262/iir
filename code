@@ -1,0 +1,52 @@
+close all;
+clear all;
+clc;
+load("rec_1m.mat");
+eeg=val(1,:);
+fs=500;
+t=1/fs;
+N=length(eeg);
+tx=[0:N-1]/fs;
+
+%plotting Original EEG
+subplot(8,1,1);
+plot(tx,eeg);
+title("Original EEG");
+x=fft(eeg);
+y=abs(x);
+subplot(8,1,2)
+plot(y);
+
+
+% plotting Noise signal...
+subplot(8,1,3);
+noise=10*randn(1,N);
+plot(tx,noise);
+title("Noise");
+x=fft(noise);
+y=abs(x);
+subplot(8,1,4);
+plot(y);
+%mixing Original + Noise
+
+mixed_sig=eeg+noise;
+subplot(8,1,5);
+plot(tx,mixed_sig);
+title("Corrupted Signal");
+y=fft(mixed_sig);
+x=abs(y);
+subplot(8,1,6);
+plot(x);
+
+%filter design
+w=50/(fs/2);
+bw=w;
+[num,den]=iirnotch(w,bw);
+eeg_notch=filter(num,den,eeg);
+subplot(8,1,7);
+plot(tx,eeg_notch)
+title("Filtered Signal");
+y=fft(eeg_notch);
+x=abs(y);
+subplot(8,1,8);
+plot(x);
